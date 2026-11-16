@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eksplorasi Transformasi Geometri — Multimedia Pembelajaran Interaktif</title>
+  <style>
+    :root {
+      --blue-dark: #0f4c81;
+      --blue-primary: #1d6fd8;
+      --blue-soft: #eff6ff;
+      --blue-border: #bfdbfe;
+      --orange-primary: #f97316;
+      --orange-dark: #ea580c;
+      --orange-soft: #fff7ed;
+      --white: #ffffff;
+      --bg-page: #f4f8fc;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-light: #e2e8f0;
+      --success: #16a34a;
+      --success-soft: #f0fdf4;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --shadow-sm: 0 2px 8px rgba(15, 76, 129, 0.08);
+      --shadow-md: 0 10px 25px rgba(15, 76, 129, 0.12);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+    .hidden { display: none !important; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+
+    .app-header {
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue-primary));
+      color: var(--white);
+      box-shadow: var(--shadow-md);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .header-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .brand-title { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.4px; }
+    .brand-subtitle { font-size: 0.8rem; opacity: 0.88; }
+    .header-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+    .audio-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.14);
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+
+    .track-badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.16);
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .btn-icon-ctrl {
+      background: rgba(255, 255, 255, 0.18);
+      border: none;
+      color: var(--white);
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+    }
+
+    .btn-icon-ctrl:hover:not(:disabled) { background: var(--orange-primary); }
+    .btn-icon-ctrl:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-icon-ctrl.active-ctrl { background: var(--orange-primary); }
+    #audio-volume { width: 68px; accent-color: var(--orange-primary); cursor: pointer; }
+
+    .stepper-nav {
+      background: rgba(15, 23, 42, 0.18);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .stepper-list {
+      display: flex;
+      overflow-x: auto;
+      gap: 6px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      scrollbar-width: thin;
+    }
+
+    .step-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--white);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .step-pill:hover { background: rgba(255, 255, 255, 0.22); }
+    .step-pill.active {
+      background: var(--orange-primary);
+      border-color: var(--orange-primary);
+      box-shadow: 0 2px 10px rgba(249, 115, 22, 0.4);
+    }
+
+    .step-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.24);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 2px solid transparent;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-lg { padding: 13px 24px; font-size: 1rem; }
+    .btn-sm { padding: 7px 12px; font-size: 0.82rem; }
+    .btn-blue { background: var(--blue-primary); color: var(--white); }
+    .btn-blue:hover:not(:disabled) { background: var(--blue-dark); }
+    .btn-orange { background: var(--orange-primary); color: var(--white); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.28); }
+    .btn-orange:hover:not(:disabled) { background: var(--orange-dark); }
+    .btn-outline { background: var(--white); color: var(--blue-dark); border-color: var(--blue-border); }
+    .btn-outline:hover:not(:disabled) { background: var(--blue-soft); }
+
+    .badge-orange {
+      display: inline-block;
+      background: var(--orange-soft);
+      color: var(--orange-dark);
+      border: 1px solid #fed7aa;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .badge-blue {
+      display: inline-block;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      border: 1px solid var(--blue-border);
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .main-content { flex: 1; padding-top: 24px; padding-bottom: 92px; }
+    .page { display: none; }
+    .page.active { display: block; animation: fadeSlideIn 0.35s ease forwards; }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 26px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+      display: grid;
+      grid-template-columns: 1.05fr 1.15fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .hero-text h2 { font-size: 1.75rem; color: var(--blue-dark); line-height: 1.25; margin-bottom: 12px; }
+    .lead-text { color: var(--text-muted); margin-bottom: 16px; }
+
+    .identity-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 20px;
+      background: var(--blue-soft);
+      border-left: 4px solid var(--blue-primary);
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+    }
+
+    .objectives-box {
+      background: #f8fafc;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+    .objectives-box h3 { font-size: 1rem; color: var(--blue-dark); margin-bottom: 8px; }
+    .objectives-box ul { padding-left: 18px; color: var(--text-muted); font-size: 0.9rem; }
+    .objectives-box li + li { margin-top: 5px; }
+
+    .video-card { background: #f8fafc; border: 1px solid var(--blue-border); border-radius: var(--radius); overflow: hidden; }
+    .video-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+    .avatar-stage { padding: 14px; text-align: center; }
+
+    /* Pemutar HeyGen Embed Responsif 16:9 */
+    .heygen-embed-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #0f172a;
+      box-shadow: var(--shadow-sm);
+    }
+    .heygen-embed-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .video-caption-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: left;
+    }
+    .video-ext-link {
+      color: var(--blue-primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .video-ext-link:hover { text-decoration: underline; }
+
+    .section-header { margin-top: 28px; margin-bottom: 14px; }
+    .section-header h3 { color: var(--blue-dark); font-size: 1.25rem; }
+    .section-header p { color: var(--text-muted); font-size: 0.92rem; }
+
+    .realworld-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .rw-card { background: var(--white); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow-sm); }
+    .rw-card h4 { color: var(--blue-dark); margin: 10px 0 6px; }
+    .rw-card p { font-size: 0.88rem; color: var(--text-muted); }
+
+    .page-banner {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .page-banner h2 { color: var(--blue-dark); font-size: 1.45rem; margin-bottom: 4px; }
+    .page-banner p { color: var(--text-muted); font-size: 0.93rem; }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .concept-card {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-top: 4px solid var(--blue-primary);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card-top h3 { font-size: 1.3rem; color: var(--blue-dark); }
+    .concept-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--orange-dark);
+      background: var(--orange-soft);
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+    }
+    .concept-visual {
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+      padding: 6px;
+    }
+    .concept-visual img { width: 100%; max-height: 230px; object-fit: contain; border-radius: 6px; }
+    .formula-box { background: var(--blue-soft); border: 1px solid var(--blue-border); border-radius: 8px; padding: 10px 12px; font-size: 0.88rem; }
+    .formula-box span { display: block; font-weight: 700; color: var(--blue-dark); margin-bottom: 2px; }
+    .formula-box code { font-family: Consolas, monospace; font-weight: 700; color: var(--orange-dark); }
+    .example-box { background: #f8fafc; border-radius: 8px; padding: 10px 12px; font-size: 0.87rem; border: 1px solid var(--border-light); }
+    .btn-toggle-ex { display: inline-block; margin-top: 6px; background: none; border: none; color: var(--blue-primary); font-weight: 700; font-size: 0.82rem; cursor: pointer; text-decoration: underline; }
+    .ex-answer { margin-top: 6px; padding: 8px 10px; background: var(--success-soft); border-left: 3px solid var(--success); border-radius: 4px; color: #14532d; }
+    .card-actions { margin-top: auto; padding-top: 4px; }
+
+    .lab-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+    .lab-controls-panel { display: flex; flex-direction: column; gap: 16px; }
+    .control-card, .result-card, .lab-graph-panel {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .control-card h3, .result-card h3 { font-size: 1rem; color: var(--blue-dark); margin-bottom: 12px; }
+    .input-group { margin-bottom: 10px; }
+    .input-group label { display: block; font-size: 0.84rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+    .slider-pair { display: flex; align-items: center; gap: 10px; }
+    .slider-pair input[type="range"] { flex: 1; accent-color: var(--blue-primary); }
+    .slider-pair input[type="number"] { width: 66px; padding: 6px 8px; border: 1px solid var(--blue-border); border-radius: 8px; font-weight: 700; text-align: center; }
+
+    .select-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--blue-border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--blue-dark);
+      background: var(--blue-soft);
+      margin-bottom: 12px;
+    }
+    .extra-params { background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 10px; }
+    .result-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: #f8fafc; margin-bottom: 8px; }
+    .result-highlight { background: var(--orange-soft); border: 1px solid #fed7aa; color: var(--orange-dark); }
+    .calc-box { background: var(--blue-soft); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: 0.88rem; }
+    .calc-label { font-weight: 700; color: var(--blue-dark); }
+    .calc-formula { font-family: Consolas, monospace; color: var(--blue-primary); margin-top: 2px; }
+    .calc-steps { font-weight: 700; color: var(--text-main); margin-top: 4px; }
+    .bound-warning { font-size: 0.82rem; color: #b45309; background: #fef3c7; padding: 8px 10px; border-radius: 8px; }
+    .graph-header { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 12px; font-size: 0.85rem; font-weight: 600; }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .dot-blue { width: 12px; height: 12px; border-radius: 50%; background: var(--blue-primary); display: inline-block; }
+    .dot-orange { width: 12px; height: 12px; border-radius: 50%; background: var(--orange-primary); display: inline-block; }
+    .line-guide { width: 18px; height: 0; border-top: 2px dashed var(--blue-dark); display: inline-block; }
+    .svg-wrapper { width: 100%; display: flex; justify-content: center; }
+    #cartesian-svg { width: 100%; max-width: 540px; height: auto; border: 1px solid var(--border-light); border-radius: 10px; background: var(--white); }
+
+    .quiz-scoreboard {
+      background: var(--white);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .score-stat span { display: block; font-size: 0.78rem; color: var(--text-muted); }
+    .score-stat strong { font-size: 1.25rem; color: var(--blue-dark); }
+    .quiz-progress-bar-wrap { flex: 1; min-width: 140px; height: 12px; background: var(--blue-soft); border-radius: 999px; overflow: hidden; }
+    .quiz-progress-bar { height: 100%; background: linear-gradient(90deg, var(--blue-primary), var(--orange-primary)); transition: width 0.3s ease; }
+    .quiz-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .q-pill { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--blue-border); background: var(--white); font-weight: 700; color: var(--blue-dark); cursor: pointer; }
+    .q-pill.active { background: var(--blue-primary); color: var(--white); border-color: var(--blue-primary); }
+    .q-pill.done-correct { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+    .q-pill.done-wrong { background: var(--orange-soft); border-color: var(--orange-primary); color: var(--orange-dark); }
+
+    .quiz-card, .quiz-summary { background: var(--white); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); }
+    .quiz-question-title { font-size: 1.12rem; color: var(--blue-dark); margin-bottom: 16px; }
+    .options-list { display: grid; gap: 10px; margin-bottom: 16px; }
+    .option-btn {
+      display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+      padding: 12px 16px; border: 2px solid var(--border-light); border-radius: 10px;
+      background: #f8fafc; font-size: 0.96rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--blue-primary); background: var(--blue-soft); }
+    .option-btn.correct { border-color: var(--success); background: var(--success-soft); color: #14532d; }
+    .option-btn.wrong { border-color: var(--danger); background: var(--danger-soft); color: #7f1d1d; }
+    .option-letter { width: 28px; height: 28px; border-radius: 8px; background: var(--blue-primary); color: var(--white); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .feedback-box { padding: 14px 16px; border-radius: 10px; margin-top: 12px; }
+    .feedback-box.correct { background: var(--success-soft); border: 1px solid #86efac; color: #14532d; }
+    .feedback-box.wrong { background: var(--orange-soft); border: 1px solid #fdba74; color: #9a3412; }
+    .feedback-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .quiz-summary { margin-top: 20px; text-align: center; border-top: 4px solid var(--orange-primary); }
+
+    .table-responsive-wrap { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); overflow-x: auto; margin-bottom: 22px; }
+    .summary-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+    .summary-table th { background: var(--blue-dark); color: var(--white); text-align: left; padding: 13px 16px; font-size: 0.9rem; }
+    .summary-table td { padding: 12px 16px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+    .summary-table tr:nth-child(even) td { background: #f8fafc; }
+    .summary-table code { background: var(--blue-soft); color: var(--blue-dark); padding: 2px 7px; border-radius: 5px; font-weight: 700; }
+
+    .closing-grid { display: grid; grid-template-columns: 0.95fr 1.15fr; gap: 20px; align-items: start; }
+    .conclusion-card { background: var(--white); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
+    .conclusion-card h3 { color: var(--blue-dark); margin-bottom: 12px; }
+    .conclusion-card ul { padding-left: 18px; color: var(--text-muted); margin-bottom: 18px; }
+    .conclusion-card li + li { margin-top: 8px; }
+    .closing-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--border-light); box-shadow: 0 -4px 16px rgba(15, 76, 129, 0.08); padding: 10px 0; z-index: 35; }
+    .bottom-nav-inner { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .nav-center-group { display: flex; align-items: center; gap: 10px; }
+    .page-status { font-size: 0.85rem; font-weight: 700; color: var(--blue-dark); min-width: 94px; text-align: center; }
+
+    .modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .modal-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.55); }
+    .modal-dialog { position: relative; background: var(--white); border-radius: var(--radius); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25); z-index: 1; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-light); background: var(--blue-soft); }
+    .modal-header h3 { color: var(--blue-dark); font-size: 1.08rem; }
+    .modal-close { background: none; border: none; font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--text-muted); }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; gap: 10px; }
+
+    @media (max-width: 920px) {
+      .hero-card, .lab-layout, .closing-grid, .realworld-grid, .cards-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .brand-title { font-size: 0.95rem; }
+      .header-controls { width: 100%; }
+      .audio-bar { width: 100%; justify-content: space-between; }
+      .track-badge { display: none; }
+      .bottom-nav-inner { gap: 6px; }
+      .page-status { min-width: auto; font-size: 0.78rem; }
+      .btn { padding: 8px 12px; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="container header-inner">
+      <div class="brand" id="brand-home" role="button" tabindex="0">
+        <div class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 36 36" width="32" height="32">
+            <rect x="3" y="3" width="30" height="30" rx="8" fill="#ffffff" fill-opacity="0.16"/>
+            <path d="M9 26 L18 10 L27 26 Z" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+            <circle cx="18" cy="10" r="2.8" fill="#f97316"/>
+            <circle cx="27" cy="26" r="2.8" fill="#38bdf8"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">EKSPLORASI TRANSFORMASI GEOMETRI</h1>
+          <p class="brand-subtitle">Multimedia Pembelajaran Matematika Interaktif</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="audio-bar" aria-label="Kontrol Audio Latar">
+          <span id="audio-track-badge" class="track-badge">Musik: Utama</span>
+          <button type="button" id="btn-audio-play" class="btn-icon-ctrl">▶ Play</button>
+          <button type="button" id="btn-audio-pause" class="btn-icon-ctrl" disabled>⏸ Pause</button>
+          <button type="button" id="btn-audio-mute" class="btn-icon-ctrl">🔊 Mute</button>
+          <input type="range" id="audio-volume" min="0" max="100" value="18" title="Volume (15-20%)" />
+        </div>
+      </div>
+    </div>
+
+    <nav class="stepper-nav" aria-label="Navigasi Halaman Modul">
+      <div class="container stepper-list">
+        <button type="button" class="step-pill active" data-page="1"><span class="step-num">1</span><span class="step-label">Beranda & Apersepsi</span></button>
+        <button type="button" class="step-pill" data-page="2"><span class="step-num">2</span><span class="step-label">Pusat Eksplorasi</span></button>
+        <button type="button" class="step-pill" data-page="3"><span class="step-num">3</span><span class="step-label">Lab Kartesius</span></button>
+        <button type="button" class="step-pill" data-page="4"><span class="step-num">4</span><span class="step-label">Kuis Gamifikasi</span></button>
+        <button type="button" class="step-pill" data-page="5"><span class="step-num">5</span><span class="step-label">Rangkuman & Evaluasi</span></button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container main-content">
+    <!-- HALAMAN 1 -->
+    <section id="page-1" class="page active">
+      <div class="hero-card">
+        <div class="hero-text">
+          <span class="badge-orange">Modul Interaktif Matematika</span>
+          <h2>Selamat Datang di Eksplorasi Transformasi Geometri</h2>
+          <p class="lead-text">
+            Pernahkah kamu memperhatikan bayangan dirimu di <strong>cermin</strong>, gerakan berputar
+            <strong>bianglala</strong>, atau efek <strong>zoom foto</strong> di ponsel pintar? Semua fenomena nyata
+            tersebut bekerja menggunakan konsep matematika <strong>Transformasi Geometri</strong>!
+          </p>
+          <div class="identity-box">
+            <div><strong>Mata Pelajaran:</strong> Matematika</div>
+            <div><strong>Topik:</strong> Translasi, Refleksi, Rotasi, &amp; Dilatasi</div>
+            <div><strong>Mode:</strong> Eksplorasi Mandiri &amp; Simulasi Interaktif</div>
+          </div>
+          <div class="objectives-box">
+            <h3>🎯 Tujuan Pembelajaran</h3>
+            <ul>
+              <li>Memahami konsep Translasi (pergeseran), Refleksi (pencerminan), Rotasi (perputaran), dan Dilatasi (perubahan skala).</li>
+              <li>Menentukan koordinat bayangan titik hasil transformasi pada bidang Kartesius.</li>
+              <li>Menguji perubahan posisi titik secara dinamis melalui Laboratorium Kartesius.</li>
+              <li>Menyelesaikan soal-soal penerapan Transformasi Geometri secara akurat.</li>
+            </ul>
+          </div>
+          <button type="button" id="btn-start-explore" class="btn btn-orange btn-lg">Mulai Eksplorasi ➜</button>
+        </div>
+
+        <!-- Video Penjelasan Awal HeyGen -->
+        <div class="hero-media">
+          <div class="video-card">
+            <div class="video-card-header">
+              <span>🎥 Video Penjelasan Awal — Mengenal 4 Jenis Transformasi Geometri</span>
+            </div>
+            <div class="avatar-stage">
+              <div class="heygen-embed-wrap">
+                <iframe
+                  id="heygen-video-1"
+                  src="https://app.heygen.com/embeds/98b92c3112e7467dad8f562489c0b02f"
+                  title="Mengenal 4 Jenis Transformasi Geometri - Video Pengajar"
+                  allow="encrypted-media; fullscreen; autoplay;"
+                  allowfullscreen
+                  loading="lazy">
+                </iframe>
+              </div>
+              <div class="video-caption-bar">
+                <span>🔊 Tekan tombol Play pada video di atas untuk mendengar penjelasan awal.</span>
+                <a
+                  class="video-ext-link"
+                  href="https://app.heygen.com/videos/mengenal-4-jenis-transformasi-geometri-98b92c3112e7467dad8f562489c0b02f"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  Buka Video di Tab Baru ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h3>Fenomena Transformasi Geometri di Sekitar Kita</h3>
+        <p>Amati bagaimana ketiga benda ini menerapkan konsep geometri dalam kehidupan sehari-hari.</p>
+      </div>
+
+      <div class="realworld-grid">
+        <article class="rw-card">
+          <svg viewBox="0 0 220 130" width="100%" height="130">
+            <rect width="220" height="130" rx="12" fill="#eff6ff"/>
+            <line x1="110" y1="12" x2="110" y2="118" stroke="#0f4c81" stroke-width="4" stroke-dasharray="6 4"/>
+            <rect x="44" y="38" width="38" height="54" rx="6" fill="#1d6fd8"/>
+            <polygon points="138,38 176,38 176,92 138,92" fill="none" stroke="#f97316" stroke-width="3" stroke-dasharray="5 3"/>
+            <text x="110" y="125" text-anchor="middle" font-size="11" fill="#0f4c81" font-weight="bold">Sumbu Cermin</text>
+          </svg>
+          <h4>1. Cermin (Refleksi)</h4>
+          <p>Jarak bayangan ke cermin sama dengan jarak benda asli ke cermin dengan orientasi terbalik.</p>
+        </article>
+
+        <article class="rw-card">
+          <svg viewBox="0 0 220 130" width="100%" height="130">
+            <rect width="220" height="130" rx="12" fill="#fff7ed"/>
+            <circle cx="110" cy="60" r="42" fill="none" stroke="#1d6fd8" stroke-width="3"/>
+            <line x1="110" y1="60" x2="110" y2="18" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="110" y1="60" x2="146" y2="82" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="110" y1="60" x2="74" y2="82" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="90" y1="115" x2="110" y2="60" stroke="#0f4c81" stroke-width="3"/>
+            <line x1="130" y1="115" x2="110" y2="60" stroke="#0f4c81" stroke-width="3"/>
+            <circle cx="110" cy="18" r="7" fill="#f97316"/><circle cx="146" cy="82" r="7" fill="#1d6fd8"/><circle cx="74" cy="82" r="7" fill="#1d6fd8"/><circle cx="110" cy="60" r="5" fill="#0f4c81"/>
+          </svg>
+          <h4>2. Bianglala (Rotasi)</h4>
+          <p>Setiap kabin bianglala berputar mengelilingi satu titik pusat dengan sudut putar tertentu.</p>
+        </article>
+
+        <article class="rw-card">
+          <svg viewBox="0 0 220 130" width="100%" height="130">
+            <defs><marker id="arrow-zoom" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,1 L7,4 L0,7 Z" fill="#f97316"/></marker></defs>
+            <rect width="220" height="130" rx="12" fill="#eff6ff"/>
+            <rect x="35" y="42" width="46" height="46" rx="6" fill="#1d6fd8" fill-opacity="0.85"/>
+            <path d="M88 65 L118 65" stroke="#f97316" stroke-width="3" marker-end="url(#arrow-zoom)"/>
+            <rect x="128" y="24" width="76" height="76" rx="8" fill="none" stroke="#f97316" stroke-width="3" stroke-dasharray="5 3"/>
+            <rect x="136" y="32" width="60" height="60" rx="6" fill="#f97316" fill-opacity="0.22"/>
+            <text x="58" y="69" text-anchor="middle" font-size="11" fill="#ffffff" font-weight="bold">1x</text>
+            <text x="166" y="66" text-anchor="middle" font-size="12" fill="#c2410c" font-weight="bold">Zoom 2x</text>
+          </svg>
+          <h4>3. Zoom Foto (Dilatasi)</h4>
+          <p>Memperbesar atau memperkecil ukuran foto secara proporsional tanpa mengubah bentuknya.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- HALAMAN 2 -->
+    <section id="page-2" class="page">
+      <div class="page-banner">
+        <span class="badge-blue">Halaman 2 — Exploration Hub</span>
+        <h2>Pusat Eksplorasi 4 Jenis Transformasi Geometri</h2>
+        <p>Pelajari definisi, rumus, ilustrasi grafik Kartesius, serta contoh soal. Klik <strong>Lihat Rumus Cepat</strong> untuk ringkasan instan.</p>
+      </div>
+
+      <div class="cards-grid">
+        <article class="concept-card">
+          <div class="card-top"><span class="concept-tag">01 • Pergeseran</span><h3>Translasi</h3></div>
+          <div class="concept-visual">
+            <img src="assets/images/translasi.png" alt="Ilustrasi Translasi (4,4)" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');" />
+            <svg class="hidden" viewBox="0 0 280 150" width="100%" height="150">
+              <rect width="280" height="150" rx="10" fill="#f8fafc"/>
+              <path d="M20 130 L260 130 M40 15 L40 140" stroke="#cbd5e1" stroke-width="1.5"/>
+              <polygon points="65,105 95,60 120,105" fill="#1d6fd8" fill-opacity="0.85"/>
+              <polygon points="155,75 185,30 210,75" fill="#f97316" fill-opacity="0.85"/>
+              <line x1="95" y1="60" x2="180" y2="32" stroke="#0f4c81" stroke-width="2.5" stroke-dasharray="5 3"/>
+              <text x="68" y="122" font-size="11" fill="#1d6fd8" font-weight="bold">Objek Awal</text>
+              <text x="160" y="92" font-size="11" fill="#c2410c" font-weight="bold">Bayangan (+a, +b)</text>
+            </svg>
+          </div>
+          <p><strong>Definisi:</strong> Perpindahan seluruh titik pada suatu bangun dengan jarak dan arah yang sama.</p>
+          <div class="formula-box"><span>Rumus:</span><code>A(x, y) —T(a, b)→ A'(x + a, y + b)</code></div>
+          <div class="example-box">
+            <strong>Contoh Soal:</strong> Titik <em>A(1, 1)</em> digeser oleh <em>T(4, 4)</em>. Tentukan bayangannya!
+            <button type="button" class="btn-toggle-ex" data-target="ex-translasi">Lihat Penyelesaian ▾</button>
+            <div id="ex-translasi" class="ex-answer hidden"><em>A'(1 + 4, 1 + 4) = A'(5, 5)</em>.</div>
+          </div>
+          <div class="card-actions"><button type="button" class="btn btn-orange btn-popup-formula" data-type="translasi">⚡ Lihat Rumus Cepat</button></div>
+        </article>
+
+        <article class="concept-card">
+          <div class="card-top"><span class="concept-tag">02 • Pencerminan</span><h3>Refleksi</h3></div>
+          <div class="concept-visual">
+            <img src="assets/images/refleksi.png" alt="Ilustrasi Refleksi Bangun PQRS" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');" />
+            <svg class="hidden" viewBox="0 0 280 150" width="100%" height="150">
+              <rect width="280" height="150" rx="10" fill="#f8fafc"/>
+              <line x1="140" y1="12" x2="140" y2="138" stroke="#0f4c81" stroke-width="3" stroke-dasharray="6 4"/>
+              <polygon points="70,105 110,45 115,105" fill="#1d6fd8" fill-opacity="0.85"/>
+              <polygon points="210,105 170,45 165,105" fill="#f97316" fill-opacity="0.85"/>
+              <text x="140" y="146" text-anchor="middle" font-size="11" fill="#0f4c81" font-weight="bold">Sumbu Y (Cermin)</text>
+            </svg>
+          </div>
+          <p><strong>Definisi:</strong> Transformasi yang memindahkan titik dengan sifat bayangan cermin datar.</p>
+          <div class="formula-box"><span>Rumus Utama:</span><code>Sb-X: (x, -y) | Sb-Y: (-x, y) | O(0,0): (-x, -y)</code></div>
+          <div class="example-box">
+            <strong>Contoh Soal:</strong> Titik <em>B(-3, 5)</em> dicerminkan terhadap sumbu X. Tentukan bayangannya!
+            <button type="button" class="btn-toggle-ex" data-target="ex-refleksi">Lihat Penyelesaian ▾</button>
+            <div id="ex-refleksi" class="ex-answer hidden">Refleksi sumbu X: <em>(x, -y)</em> → <em>B'(-3, -5)</em>.</div>
+          </div>
+          <div class="card-actions"><button type="button" class="btn btn-orange btn-popup-formula" data-type="refleksi">⚡ Lihat Rumus Cepat</button></div>
+        </article>
+
+        <article class="concept-card">
+          <div class="card-top"><span class="concept-tag">03 • Perputaran</span><h3>Rotasi</h3></div>
+          <div class="concept-visual">
+            <img src="assets/images/rotasi.png" alt="Ilustrasi Rotasi 90 Derajat" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');" />
+            <svg class="hidden" viewBox="0 0 280 150" width="100%" height="150">
+              <rect width="280" height="150" rx="10" fill="#f8fafc"/>
+              <circle cx="140" cy="85" r="46" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="4 4"/>
+              <circle cx="140" cy="85" r="4" fill="#0f4c81"/>
+              <line x1="140" y1="85" x2="186" y2="85" stroke="#1d6fd8" stroke-width="2"/>
+              <line x1="140" y1="85" x2="140" y2="39" stroke="#f97316" stroke-width="2"/>
+              <circle cx="186" cy="85" r="6" fill="#1d6fd8"/><circle cx="140" cy="39" r="6" fill="#f97316"/>
+              <text x="168" y="54" font-size="11" fill="#0f4c81" font-weight="bold">+90°</text>
+            </svg>
+          </div>
+          <p><strong>Definisi:</strong> Memutar setiap titik terhadap titik pusat tertentu sebesar sudut tertentu.</p>
+          <div class="formula-box"><span>Pusat O(0,0):</span><code>90°: (-y, x) | 180°: (-x, -y) | 270°: (y, -x)</code></div>
+          <div class="example-box">
+            <strong>Contoh Soal:</strong> Titik <em>C(1, 4)</em> dirotasikan 90° berlawanan arah jarum jam pusat O.
+            <button type="button" class="btn-toggle-ex" data-target="ex-rotasi">Lihat Penyelesaian ▾</button>
+            <div id="ex-rotasi" class="ex-answer hidden">Rotasi +90°: <em>(-y, x)</em> → <em>C'(-4, 1)</em>.</div>
+          </div>
+          <div class="card-actions"><button type="button" class="btn btn-orange btn-popup-formula" data-type="rotasi">⚡ Lihat Rumus Cepat</button></div>
+        </article>
+
+        <article class="concept-card">
+          <div class="card-top"><span class="concept-tag">04 • Perkalian Skala</span><h3>Dilatasi</h3></div>
+          <div class="concept-visual">
+            <img src="assets/images/dilatasi.png" alt="Ilustrasi Dilatasi k=3" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');" />
+            <svg class="hidden" viewBox="0 0 280 150" width="100%" height="150">
+              <rect width="280" height="150" rx="10" fill="#f8fafc"/>
+              <circle cx="40" cy="120" r="4" fill="#0f4c81"/>
+              <rect x="85" y="88" width="32" height="32" fill="#1d6fd8" fill-opacity="0.8"/>
+              <rect x="135" y="56" width="64" height="64" fill="none" stroke="#f97316" stroke-width="3"/>
+              <text x="167" y="92" text-anchor="middle" font-size="11" fill="#c2410c" font-weight="bold">Skala k = 3</text>
+            </svg>
+          </div>
+          <p><strong>Definisi:</strong> Mengubah ukuran bangun (memperbesar/memperkecil) berdasarkan titik pusat dan skala <em>k</em>.</p>
+          <div class="formula-box"><span>Pusat O(0,0):</span><code>A(x, y) —[O, k]→ A'(k·x, k·y)</code></div>
+          <div class="example-box">
+            <strong>Contoh Soal:</strong> Titik <em>P(2, 2)</em> didilatasikan dengan pusat O dan skala <em>k = 3</em>.
+            <button type="button" class="btn-toggle-ex" data-target="ex-dilatasi">Lihat Penyelesaian ▾</button>
+            <div id="ex-dilatasi" class="ex-answer hidden"><em>P'(3·2, 3·2) = P'(6, 6)</em>.</div>
+          </div>
+          <div class="card-actions"><button type="button" class="btn btn-orange btn-popup-formula" data-type="dilatasi">⚡ Lihat Rumus Cepat</button></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- HALAMAN 3 -->
+    <section id="page-3" class="page">
+      <div class="page-banner">
+        <span class="badge-blue">Halaman 3 — Simulasi Interaktif</span>
+        <h2>Laboratorium Bidang Kartesius (-6 s.d. 6)</h2>
+        <p>Masukkan koordinat titik awal <strong>(x, y)</strong> dan pilih jenis transformasi untuk melihat perhitungan serta grafik yang berubah langsung.</p>
+      </div>
+
+      <div class="lab-layout">
+        <div class="lab-controls-panel">
+          <div class="control-card">
+            <h3>1. Koordinat Titik Awal A(x, y)</h3>
+            <div class="input-group">
+              <label for="sim-x">Nilai x (-6 s.d. 6)</label>
+              <div class="slider-pair"><input type="range" id="sim-x-range" min="-6" max="6" step="1" value="2" /><input type="number" id="sim-x" min="-6" max="6" step="1" value="2" /></div>
+            </div>
+            <div class="input-group">
+              <label for="sim-y">Nilai y (-6 s.d. 6)</label>
+              <div class="slider-pair"><input type="range" id="sim-y-range" min="-6" max="6" step="1" value="3" /><input type="number" id="sim-y" min="-6" max="6" step="1" value="3" /></div>
+            </div>
+          </div>
+
+          <div class="control-card">
+            <h3>2. Pilih Jenis Transformasi</h3>
+            <select id="sim-transform" class="select-input">
+              <option value="translasi">Translasi: T(a, b) → (x + a, y + b)</option>
+              <option value="refleksi-x">Refleksi Sumbu X → (x, -y)</option>
+              <option value="refleksi-y">Refleksi Sumbu Y → (-x, y)</option>
+              <option value="refleksi-o">Refleksi Titik Pusat O(0,0) → (-x, -y)</option>
+              <option value="rotasi-90">Rotasi 90° Berlawanan Jarum Jam → (-y, x)</option>
+              <option value="rotasi-180">Rotasi 180° → (-x, -y)</option>
+              <option value="rotasi-270">Rotasi 270° Berlawanan Jarum Jam → (y, -x)</option>
+              <option value="dilatasi">Dilatasi Pusat O(0,0), Skala k → (k·x, k·y)</option>
+            </select>
+
+            <div id="param-translasi" class="extra-params">
+              <div class="input-group"><label for="sim-a">Pergeseran horizontal (a)</label><div class="slider-pair"><input type="range" id="sim-a-range" min="-6" max="6" step="1" value="2" /><input type="number" id="sim-a" min="-6" max="6" step="1" value="2" /></div></div>
+              <div class="input-group"><label for="sim-b">Pergeseran vertikal (b)</label><div class="slider-pair"><input type="range" id="sim-b-range" min="-6" max="6" step="1" value="-4" /><input type="number" id="sim-b" min="-6" max="6" step="1" value="-4" /></div></div>
+            </div>
+
+            <div id="param-dilatasi" class="extra-params hidden">
+              <div class="input-group"><label for="sim-k">Faktor Skala (k)</label><div class="slider-pair"><input type="range" id="sim-k-range" min="-3" max="3" step="0.5" value="2" /><input type="number" id="sim-k" min="-3" max="3" step="0.5" value="2" /></div></div>
+            </div>
+
+            <button type="button" id="btn-sim-reset" class="btn btn-outline btn-sm">↺ Reset Default</button>
+          </div>
+
+          <div class="result-card">
+            <h3>3. Hasil &amp; Langkah Perhitungan</h3>
+            <div class="result-row"><span class="dot-blue"></span><span>Koordinat Awal:</span><strong id="out-initial">A(2, 3)</strong></div>
+            <div class="calc-box">
+              <div class="calc-label">Rumus &amp; Substitusi:</div>
+              <div id="out-formula" class="calc-formula">(x + a, y + b)</div>
+              <div id="out-steps" class="calc-steps">A'(2 + 2, 3 + (-4))</div>
+            </div>
+            <div class="result-row result-highlight"><span class="dot-orange"></span><span>Koordinat Bayangan:</span><strong id="out-image">A'(4, -1)</strong></div>
+            <p id="out-bound-warning" class="bound-warning hidden">⚠️ Catatan: Koordinat bayangan di luar tampilan (-6 s.d. 6), panah menunjukkan arahnya.</p>
+          </div>
+        </div>
+
+        <div class="lab-graph-panel">
+          <div class="graph-header">
+            <span class="legend-item"><span class="dot-blue"></span> Titik Awal A(x, y)</span>
+            <span class="legend-item"><span class="dot-orange"></span> Bayangan A'(x', y')</span>
+            <span class="legend-item"><span class="line-guide"></span> Jejak Transformasi</span>
+          </div>
+          <div class="svg-wrapper"><svg id="cartesian-svg" viewBox="0 0 520 520" role="img"></svg></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HALAMAN 4 -->
+    <section id="page-4" class="page">
+      <div class="page-banner">
+        <span class="badge-orange">Halaman 4 — Evaluasi Interaktif</span>
+        <h2>Kuis Gamifikasi Transformasi Geometri</h2>
+        <p>Jawab 5 soal pilihan ganda berikut untuk menguji pemahamanmu. Musik otomatis berubah menjadi tema kuis yang bersemangat!</p>
+      </div>
+
+      <div class="quiz-scoreboard">
+        <div class="score-stat"><span>Skor Saat Ini</span><strong id="quiz-score">0 / 100</strong></div>
+        <div class="score-stat"><span>Progres Soal</span><strong id="quiz-progress-text">0 dari 5 Terjawab</strong></div>
+        <div class="quiz-progress-bar-wrap"><div id="quiz-progress-bar" class="quiz-progress-bar" style="width: 0%"></div></div>
+        <button type="button" id="btn-quiz-reset-all" class="btn btn-outline btn-sm">↺ Ulangi Kuis</button>
+      </div>
+
+      <div id="quiz-nav-pills" class="quiz-pills"></div>
+      <div id="quiz-card-container" class="quiz-card"></div>
+      <div id="quiz-summary-card" class="quiz-summary hidden"></div>
+    </section>
+
+    <!-- HALAMAN 5 -->
+    <section id="page-5" class="page">
+      <div class="page-banner">
+        <span class="badge-blue">Halaman 5 — Rangkuman &amp; Penutup</span>
+        <h2>Matriks Ringkasan Rumus &amp; Kesimpulan</h2>
+        <p>Gunakan tabel di bawah ini sebagai catatan ringkas seluruh rumus Transformasi Geometri.</p>
+      </div>
+
+      <div class="table-responsive-wrap">
+        <table class="summary-table">
+          <thead>
+            <tr><th>Jenis Transformasi</th><th>Keterangan / Parameter</th><th>Rumus Pemetaan (x, y) → (x', y')</th><th>Contoh Singkat</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Translasi</strong></td><td>Pergeseran oleh T(a, b)</td><td><code>(x + a, y + b)</code></td><td>(1, 1) + T(4, 4) → (5, 5)</td></tr>
+            <tr><td><strong>Refleksi</strong></td><td>Terhadap Sumbu X</td><td><code>(x, -y)</code></td><td>(2, 5) → (2, -5)</td></tr>
+            <tr><td><strong>Refleksi</strong></td><td>Terhadap Sumbu Y</td><td><code>(-x, y)</code></td><td>(2, 5) → (-2, 5)</td></tr>
+            <tr><td><strong>Refleksi</strong></td><td>Terhadap Titik Pusat O(0,0)</td><td><code>(-x, -y)</code></td><td>(2, 5) → (-2, -5)</td></tr>
+            <tr><td><strong>Rotasi</strong></td><td>+90° (Berlawanan jarum jam), Pusat O</td><td><code>(-y, x)</code></td><td>(1, 4) → (-4, 1)</td></tr>
+            <tr><td><strong>Rotasi</strong></td><td>180°, Pusat O</td><td><code>(-x, -y)</code></td><td>(3, 2) → (-3, -2)</td></tr>
+            <tr><td><strong>Rotasi</strong></td><td>+270° (Berlawanan jarum jam), Pusat O</td><td><code>(y, -x)</code></td><td>(3, 2) → (2, -3)</td></tr>
+            <tr><td><strong>Dilatasi</strong></td><td>Pusat O(0,0) dengan Faktor Skala k</td><td><code>(k·x, k·y)</code></td><td>(2, 2), k = 3 → (6, 6)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="closing-grid">
+        <div class="conclusion-card">
+          <h3>📌 Kesimpulan Pembelajaran</h3>
+          <ul>
+            <li><strong>Translasi</strong> menggeser posisi tanpa mengubah bentuk, ukuran, maupun orientasi.</li>
+            <li><strong>Refleksi</strong> mencerminkan bangun sehingga posisi berlawanan terhadap sumbu/titik cermin dengan ukuran tetap.</li>
+            <li><strong>Rotasi</strong> memutar bangun terhadap titik pusat pada sudut tertentu dengan ukuran tetap.</li>
+            <li><strong>Dilatasi</strong> memperbesar atau memperkecil ukuran bangun secara sebangun dengan faktor skala <em>k</em>.</li>
+          </ul>
+          <div class="closing-actions">
+            <button type="button" class="btn btn-blue" id="btn-review-lab">🔬 Kembali ke Lab Kartesius</button>
+            <button type="button" class="btn btn-orange" id="btn-retake-quiz">📝 Ulangi Kuis</button>
+          </div>
+        </div>
+
+        <!-- Video Penutup HeyGen -->
+        <div class="video-card">
+          <div class="video-card-header">
+            <span>🎥 Video Penutup — Ringkasan Konsep Transformasi Geometri</span>
+          </div>
+          <div class="avatar-stage">
+            <div class="heygen-embed-wrap">
+              <iframe
+                id="heygen-video-2"
+                src="https://app.heygen.com/embeds/9f5c7152d04a4470a2cd6e81d7f84cc6"
+                title="Ringkasan Konsep Transformasi Geometri - Video Penutup"
+                allow="encrypted-media; fullscreen; autoplay;"
+                allowfullscreen
+                loading="lazy">
+              </iframe>
+            </div>
+            <div class="video-caption-bar">
+              <span>🔊 Putar video di atas untuk mendengar ringkasan &amp; penutup dari pengajar.</span>
+              <a
+                class="video-ext-link"
+                href="https://app.heygen.com/videos/ringkasan-konsep-transformasi-geometri-9f5c7152d04a4470a2cd6e81d7f84cc6"
+                target="_blank"
+                rel="noopener noreferrer">
+                Buka Video di Tab Baru ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottom-nav">
+    <div class="container bottom-nav-inner">
+      <button type="button" id="nav-home" class="btn btn-outline">🏠 Home</button>
+      <div class="nav-center-group">
+        <button type="button" id="nav-back" class="btn btn-blue">← Back</button>
+        <span id="nav-page-status" class="page-status">Halaman 1 / 5</span>
+        <button type="button" id="nav-next" class="btn btn-orange">Next →</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal Rumus Cepat -->
+  <div id="formula-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close-modal="formula-modal"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="formula-modal-title">Rumus Cepat</h3>
+        <button type="button" class="modal-close" data-close-modal="formula-modal">&times;</button>
+      </div>
+      <div id="formula-modal-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" id="btn-try-in-lab" class="btn btn-orange">🔬 Coba di Lab Kartesius</button>
+        <button type="button" class="btn btn-outline" data-close-modal="formula-modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audio-bgm-main" loop preload="auto">
+    <source src="assets/audio/musik-utama.mp3" type="audio/mpeg" />
+    <source src="assets/audio/musik-utama.wav" type="audio/wav" />
+  </audio>
+  <audio id="audio-bgm-quiz" loop preload="auto">
+    <source src="assets/audio/musik-kuis.mp3" type="audio/mpeg" />
+    <source src="assets/audio/musik-kuis.wav" type="audio/wav" />
+  </audio>
+
+  <script>
+    const HEYGEN_EMBED_URL_1 = 'https://app.heygen.com/embeds/98b92c3112e7467dad8f562489c0b02f';
+    const HEYGEN_EMBED_URL_2 = 'https://app.heygen.com/embeds/9f5c7152d04a4470a2cd6e81d7f84cc6';
+
+    const appState = {
+      currentPage: 1,
+      totalPages: 5,
+      selectedPopupTransform: 'translasi',
+      audio: { isPlaying: false, isMuted: false, volume: 0.18, synthTimer: null, audioCtx: null },
+      quiz: {
+        currentIndex: 0,
+        answers: Array(5).fill(null),
+        status: Array(5).fill('unanswered'),
+        retried: Array(5).fill(false),
+        revealed: Array(5).fill(false),
+        earnedPoints: Array(5).fill(0)
+      }
+    };
+
+    const QUICK_FORMULAS = {
+      translasi: {
+        title: 'Rumus Cepat: Translasi (Pergeseran)',
+        labValue: 'translasi',
+        html: `<p><strong>Prinsip Utama:</strong> Jumlahkan koordinat awal dengan vektor pergeseran <code>T(a, b)</code>.</p>
+               <div class="formula-box" style="margin:12px 0;"><code>A(x, y) + T(a, b) = A'(x + a, y + b)</code></div>
+               <ul style="padding-left:18px;"><li><strong>a &gt; 0</strong>: kanan | <strong>a &lt; 0</strong>: kiri</li><li><strong>b &gt; 0</strong>: atas | <strong>b &lt; 0</strong>: bawah</li></ul>`
+      },
+      refleksi: {
+        title: 'Rumus Cepat: Refleksi (Pencerminan)',
+        labValue: 'refleksi-x',
+        html: `<p><strong>Trik Menghafal:</strong> Huruf sumbu cermin tetap, koordinat pasangannya berubah tanda!</p>
+               <div class="formula-box" style="margin:12px 0;">
+                 <div>• Sumbu X → <code>(x, -y)</code></div>
+                 <div>• Sumbu Y → <code>(-x, y)</code></div>
+                 <div>• Pusat O(0,0) → <code>(-x, -y)</code></div>
+               </div>`
+      },
+      rotasi: {
+        title: 'Rumus Cepat: Rotasi Pusat O(0,0)',
+        labValue: 'rotasi-90',
+        html: `<p><strong>Arah Positif (+):</strong> Berlawanan arah jarum jam.</p>
+               <div class="formula-box" style="margin:12px 0;">
+                 <div>• Rotasi +90° → <code>(-y, x)</code></div>
+                 <div>• Rotasi 180° → <code>(-x, -y)</code></div>
+                 <div>• Rotasi +270° → <code>(y, -x)</code></div>
+               </div>`
+      },
+      dilatasi: {
+        title: 'Rumus Cepat: Dilatasi Pusat O(0,0)',
+        labValue: 'dilatasi',
+        html: `<p><strong>Prinsip Utama:</strong> Kalikan koordinat dengan faktor skala <code>k</code>.</p>
+               <div class="formula-box" style="margin:12px 0;"><code>A(x, y) —[O, k]→ A'(k·x, k·y)</code></div>
+               <ul style="padding-left:18px;"><li><strong>|k| &gt; 1</strong>: diperbesar</li><li><strong>0 &lt; |k| &lt; 1</strong>: diperkecil</li></ul>`
+      }
+    };
+
+    const QUIZ_QUESTIONS = [
+      { question: '1. Titik P(-2, 4) digeser (translasi) oleh T(5, -3). Koordinat bayangan titik P\' adalah...', options: ['(3, 1)', '(-7, 7)', '(3, 7)', '(1, 3)'], correctIndex: 0, explanation: 'P\'(-2 + 5, 4 + (-3)) = P\'(3, 1).' },
+      { question: '2. Bayangan titik Q(4, -5) jika dicerminkan (refleksi) terhadap sumbu Y adalah...', options: ['(4, 5)', '(-4, -5)', '(-4, 5)', '(-5, 4)'], correctIndex: 1, explanation: 'Refleksi sumbu Y: (x, y) → (-x, y), maka Q\'(-4, -5).' },
+      { question: '3. Titik R(3, 2) diputar (rotasi) sebesar 90° berlawanan arah jarum jam dengan pusat O(0,0). Koordinat bayangan R\' adalah...', options: ['(2, -3)', '(-3, -2)', '(-2, 3)', '(3, -2)'], correctIndex: 2, explanation: 'Rotasi +90°: (-y, x), maka R\'(-2, 3).' },
+      { question: '4. Titik S(-1, 2) didilatasikan terhadap titik pusat O(0,0) dengan faktor skala k = 3. Koordinat bayangan S\' adalah...', options: ['(-3, 6)', '(2, 5)', '(-3, 2)', '(3, -6)'], correctIndex: 0, explanation: 'Dilatasi (k·x, k·y) = (3·(-1), 3·2) = S\'(-3, 6).' },
+      { question: '5. Sebuah kapsul bianglala berada pada titik K(1, -4) lalu berputar 270° berlawanan arah jarum jam terhadap pusat O(0,0). Posisi baru kapsul adalah...', options: ['(4, 1)', '(-1, 4)', '(4, -1)', '(-4, -1)'], correctIndex: 3, explanation: 'Rotasi +270°: (y, -x), maka K\'(-4, -1).' }
+    ];
+
+    function goToPage(pageNum) {
+      if (pageNum < 1 || pageNum > appState.totalPages) return;
+      const prevPage = appState.currentPage;
+      appState.currentPage = pageNum;
+
+      document.querySelectorAll('.page').forEach((s) => s.classList.remove('active'));
+      document.getElementById(`page-${pageNum}`)?.classList.add('active');
+      document.querySelectorAll('.step-pill').forEach((p) => p.classList.toggle('active', Number(p.dataset.page) === pageNum));
+      document.getElementById('nav-back').disabled = pageNum === 1;
+      document.getElementById('nav-next').disabled = pageNum === appState.totalPages;
+      document.getElementById('nav-page-status').textContent = `Halaman ${pageNum} / ${appState.totalPages}`;
+
+      // Hentikan pemutar video HeyGen saat berpindah keluar dari Halaman 1 atau Halaman 5
+      if (prevPage === 1 && pageNum !== 1) {
+        const frame1 = document.getElementById('heygen-video-1');
+        if (frame1) frame1.src = HEYGEN_EMBED_URL_1;
+      }
+      if (prevPage === 5 && pageNum !== 5) {
+        const frame2 = document.getElementById('heygen-video-2');
+        if (frame2) frame2.src = HEYGEN_EMBED_URL_2;
+      }
+
+      syncTrackForPage(pageNum);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getAudioContext() {
+      if (!appState.audio.audioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) appState.audio.audioCtx = new Ctx();
+      }
+      if (appState.audio.audioCtx && appState.audio.audioCtx.state === 'suspended') appState.audio.audioCtx.resume();
+      return appState.audio.audioCtx;
+    }
+
+    function playSynthNote(freq, duration = 0.4, type = 'sine', volScale = 0.25) {
+      if (appState.audio.isMuted) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      const vol = Math.max(0.01, appState.audio.volume * volScale);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(vol, ctx.currentTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + duration);
+    }
+
+    function startSynthLoop(isQuizMode) {
+      stopSynthLoop();
+      const notes = isQuizMode ? [392.0, 440.0, 523.25, 587.33, 523.25, 440.0] : [261.63, 329.63, 392.0, 523.25, 392.0, 329.63];
+      const tempo = isQuizMode ? 520 : 950;
+      let i = 0;
+      playSynthNote(notes[0], isQuizMode ? 0.35 : 0.9, isQuizMode ? 'triangle' : 'sine', 0.22);
+      appState.audio.synthTimer = setInterval(() => {
+        if (!appState.audio.isPlaying || appState.audio.isMuted) return;
+        i = (i + 1) % notes.length;
+        playSynthNote(notes[i], isQuizMode ? 0.35 : 0.9, isQuizMode ? 'triangle' : 'sine', 0.22);
+      }, tempo);
+    }
+
+    function stopSynthLoop() {
+      if (appState.audio.synthTimer) { clearInterval(appState.audio.synthTimer); appState.audio.synthTimer = null; }
+    }
+
+    function playActiveBgm() {
+      const isQuiz = appState.currentPage === 4;
+      const bgmMain = document.getElementById('audio-bgm-main');
+      const bgmQuiz = document.getElementById('audio-bgm-quiz');
+      const activeEl = isQuiz ? bgmQuiz : bgmMain;
+      const otherEl = isQuiz ? bgmMain : bgmQuiz;
+      otherEl.pause();
+      stopSynthLoop();
+      activeEl.muted = appState.audio.isMuted;
+      activeEl.volume = appState.audio.volume;
+      activeEl.play().catch(() => { if (appState.audio.isPlaying) startSynthLoop(isQuiz); });
+    }
+
+    function syncTrackForPage(pageNum) {
+      document.getElementById('audio-track-badge').textContent = pageNum === 4 ? 'Musik: Kuis' : 'Musik: Utama';
+      if (appState.audio.isPlaying) playActiveBgm();
+    }
+
+    function playSfx(type) {
+      if (appState.audio.isMuted) return;
+      if (type === 'correct') {
+        playSynthNote(523.25, 0.2, 'triangle', 0.7);
+        setTimeout(() => playSynthNote(659.25, 0.25, 'triangle', 0.7), 110);
+        setTimeout(() => playSynthNote(783.99, 0.35, 'triangle', 0.7), 220);
+      } else {
+        playSynthNote(240, 0.22, 'sawtooth', 0.25);
+        setTimeout(() => playSynthNote(195, 0.28, 'sawtooth', 0.25), 160);
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    function formatNum(n) { return Number.isInteger(n) ? String(n) : Number(n.toFixed(2)).toString(); }
+    function fmtSigned(n) { return n < 0 ? `(${formatNum(n)})` : formatNum(n); }
+
+    function computeTransformation(x, y, type, a, b, k) {
+      switch (type) {
+        case 'translasi': return { xp: x + a, yp: y + b, formula: '(x + a, y + b)', steps: `A'(${formatNum(x)} + ${fmtSigned(a)}, ${formatNum(y)} + ${fmtSigned(b)})` };
+        case 'refleksi-x': return { xp: x, yp: -y, formula: '(x, -y)', steps: `A'(${formatNum(x)}, -${fmtSigned(y)})` };
+        case 'refleksi-y': return { xp: -x, yp: y, formula: '(-x, y)', steps: `A'(-${fmtSigned(x)}, ${formatNum(y)})` };
+        case 'refleksi-o': return { xp: -x, yp: -y, formula: '(-x, -y)', steps: `A'(-${fmtSigned(x)}, -${fmtSigned(y)})` };
+        case 'rotasi-90': return { xp: -y, yp: x, formula: '(-y, x)', steps: `A'(-${fmtSigned(y)}, ${formatNum(x)})` };
+        case 'rotasi-180': return { xp: -x, yp: -y, formula: '(-x, -y)', steps: `A'(-${fmtSigned(x)}, -${fmtSigned(y)})` };
+        case 'rotasi-270': return { xp: y, yp: -x, formula: '(y, -x)', steps: `A'(${formatNum(y)}, -${fmtSigned(x)})` };
+        case 'dilatasi': return { xp: k * x, yp: k * y, formula: '(k·x, k·y)', steps: `A'(${formatNum(k)} × ${fmtSigned(x)}, ${formatNum(k)} × ${fmtSigned(y)})` };
+        default: return { xp: x, yp: y, formula: '(x, y)', steps: `A'(${x}, ${y})` };
+      }
+    }
+
+    function drawCartesianSVG(x, y, xp, yp, type) {
+      const svg = document.getElementById('cartesian-svg');
+      const size = 520, pad = 40, unit = (size - pad * 2) / 12;
+      const toPxX = (v) => pad + (v + 6) * unit;
+      const toPxY = (v) => pad + (6 - v) * unit;
+      const cx0 = toPxX(0), cy0 = toPxY(0);
+
+      let markup = `<defs>
+        <marker id="arrow-axis" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,1 L7,4 L0,7 Z" fill="#0f4c81"/></marker>
+        <marker id="arrow-orange" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,1 L7,4 L0,7 Z" fill="#f97316"/></marker>
+      </defs><rect x="0" y="0" width="${size}" height="${size}" fill="#ffffff"/>`;
+
+      for (let i = -6; i <= 6; i++) {
+        const gx = toPxX(i), gy = toPxY(i);
+        if (i !== 0) {
+          markup += `<line x1="${gx}" y1="${pad}" x2="${gx}" y2="${size - pad}" stroke="#e2e8f0" stroke-width="1"/>`;
+          markup += `<line x1="${pad}" y1="${gy}" x2="${size - pad}" y2="${gy}" stroke="#e2e8f0" stroke-width="1"/>`;
+          markup += `<text x="${gx}" y="${cy0 + 16}" text-anchor="middle" font-size="11" fill="#475569" font-weight="600">${i}</text>`;
+          markup += `<text x="${cx0 - 12}" y="${gy + 4}" text-anchor="end" font-size="11" fill="#475569" font-weight="600">${i}</text>`;
+        }
+      }
+
+      markup += `
+        <line x1="${pad - 12}" y1="${cy0}" x2="${size - pad + 16}" y2="${cy0}" stroke="#0f4c81" stroke-width="2.2" marker-end="url(#arrow-axis)"/>
+        <line x1="${cx0}" y1="${size - pad + 12}" x2="${cx0}" y2="${pad - 16}" stroke="#0f4c81" stroke-width="2.2" marker-end="url(#arrow-axis)"/>
+        <text x="${size - pad + 20}" y="${cy0 + 4}" font-size="13" fill="#0f4c81" font-weight="800">X</text>
+        <text x="${cx0 + 10}" y="${pad - 14}" font-size="13" fill="#0f4c81" font-weight="800">Y</text>
+        <text x="${cx0 - 10}" y="${cy0 + 16}" text-anchor="end" font-size="11" fill="#0f4c81" font-weight="800">0</text>
+      `;
+
+      if (type === 'refleksi-x') markup += `<line x1="${pad}" y1="${cy0}" x2="${size - pad}" y2="${cy0}" stroke="#f97316" stroke-width="4" stroke-opacity="0.35"/>`;
+      else if (type === 'refleksi-y') markup += `<line x1="${cx0}" y1="${pad}" x2="${cx0}" y2="${size - pad}" stroke="#f97316" stroke-width="4" stroke-opacity="0.35"/>`;
+
+      const ax = toPxX(x), ay = toPxY(y);
+      const bx = toPxX(Math.max(-6, Math.min(6, xp))), by = toPxY(Math.max(-6, Math.min(6, yp)));
+      const isOut = Math.abs(xp) > 6 || Math.abs(yp) > 6;
+
+      if (type === 'translasi') {
+        markup += `<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="#f97316" stroke-width="2.2" stroke-dasharray="6 4" marker-end="url(#arrow-orange)"/>`;
+      } else if (type.startsWith('refleksi')) {
+        markup += `<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="#0f4c81" stroke-width="2" stroke-dasharray="5 4"/>`;
+        if (type === 'refleksi-o') markup += `<circle cx="${cx0}" cy="${cy0}" r="6" fill="none" stroke="#f97316" stroke-width="2.5"/>`;
+      } else if (type.startsWith('rotasi')) {
+        const rPx = Math.hypot(ax - cx0, ay - cy0);
+        if (rPx > 2) markup += `<circle cx="${cx0}" cy="${cy0}" r="${rPx}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+        markup += `<line x1="${cx0}" y1="${cy0}" x2="${ax}" y2="${ay}" stroke="#1d6fd8" stroke-width="1.8" stroke-dasharray="4 3"/>`;
+        markup += `<line x1="${cx0}" y1="${cy0}" x2="${bx}" y2="${by}" stroke="#f97316" stroke-width="1.8" stroke-dasharray="4 3"/>`;
+      } else if (type === 'dilatasi') {
+        markup += `<line x1="${cx0}" y1="${cy0}" x2="${ax}" y2="${ay}" stroke="#1d6fd8" stroke-width="1.8" stroke-dasharray="4 3"/>`;
+        markup += `<line x1="${cx0}" y1="${cy0}" x2="${bx}" y2="${by}" stroke="#f97316" stroke-width="2" stroke-dasharray="4 3"/>`;
+      }
+
+      const aLblX = ax > size - 105 ? ax - 80 : ax + 9;
+      const aLblY = ay < 45 ? ay + 8 : ay - 24;
+      markup += `<circle cx="${ax}" cy="${ay}" r="7.5" fill="#1d6fd8" stroke="#ffffff" stroke-width="2"/>
+        <rect x="${aLblX}" y="${aLblY}" width="72" height="20" rx="5" fill="#1d6fd8"/>
+        <text x="${aLblX + 36}" y="${aLblY + 14}" text-anchor="middle" font-size="11" fill="#ffffff" font-weight="700">A(${formatNum(x)}, ${formatNum(y)})</text>`;
+
+      const bLblX = bx > size - 115 ? bx - 84 : bx + 9;
+      const bLblY = by < 55 ? by + 10 : by + 6;
+      markup += `<circle cx="${bx}" cy="${by}" r="7.5" fill="${isOut ? '#fb923c' : '#f97316'}" stroke="#ffffff" stroke-width="2"/>
+        <rect x="${bLblX}" y="${bLblY}" width="78" height="20" rx="5" fill="#f97316"/>
+        <text x="${bLblX + 39}" y="${bLblY + 14}" text-anchor="middle" font-size="11" fill="#ffffff" font-weight="700">A'(${formatNum(xp)}, ${formatNum(yp)})</text>`;
+
+      svg.innerHTML = markup;
+    }
+
+    function updateCartesianSimulation() {
+      const x = Math.max(-6, Math.min(6, Number(document.getElementById('sim-x').value) || 0));
+      const y = Math.max(-6, Math.min(6, Number(document.getElementById('sim-y').value) || 0));
+      const type = document.getElementById('sim-transform').value;
+      const a = Number(document.getElementById('sim-a').value) || 0;
+      const b = Number(document.getElementById('sim-b').value) || 0;
+      const k = Number(document.getElementById('sim-k').value) || 1;
+
+      document.getElementById('param-translasi').classList.toggle('hidden', type !== 'translasi');
+      document.getElementById('param-dilatasi').classList.toggle('hidden', type !== 'dilatasi');
+
+      const res = computeTransformation(x, y, type, a, b, k);
+      document.getElementById('out-initial').textContent = `A(${formatNum(x)}, ${formatNum(y)})`;
+      document.getElementById('out-formula').textContent = res.formula;
+      document.getElementById('out-steps').textContent = res.steps;
+      document.getElementById('out-image').textContent = `A'(${formatNum(res.xp)}, ${formatNum(res.yp)})`;
+      document.getElementById('out-bound-warning').classList.toggle('hidden', !(Math.abs(res.xp) > 6 || Math.abs(res.yp) > 6));
+      drawCartesianSVG(x, y, res.xp, res.yp, type);
+    }
+
+    function renderQuiz() {
+      const idx = appState.quiz.currentIndex;
+      const q = QUIZ_QUESTIONS[idx];
+      const status = appState.quiz.status[idx];
+      const selected = appState.quiz.answers[idx];
+      const revealed = appState.quiz.revealed[idx];
+
+      const totalScore = appState.quiz.earnedPoints.reduce((a, v) => a + v, 0);
+      const answeredCount = appState.quiz.status.filter((s) => s !== 'unanswered').length;
+      document.getElementById('quiz-score').textContent = `${totalScore} / 100`;
+      document.getElementById('quiz-progress-text').textContent = `${answeredCount} dari 5 Terjawab`;
+      document.getElementById('quiz-progress-bar').style.width = `${(answeredCount / 5) * 100}%`;
+
+      const pillsWrap = document.getElementById('quiz-nav-pills');
+      pillsWrap.innerHTML = QUIZ_QUESTIONS.map((_, i) => {
+        const st = appState.quiz.status[i];
+        let cls = 'q-pill';
+        if (i === idx) cls += ' active';
+        if (st === 'correct') cls += ' done-correct';
+        else if (st === 'wrong') cls += ' done-wrong';
+        return `<button type="button" class="${cls}" data-qidx="${i}">Soal ${i + 1}</button>`;
+      }).join('');
+      pillsWrap.querySelectorAll('.q-pill').forEach((btn) => btn.addEventListener('click', () => { appState.quiz.currentIndex = Number(btn.dataset.qidx); renderQuiz(); }));
+
+      const letters = ['A', 'B', 'C', 'D'];
+      const locked = status === 'correct' || revealed || status === 'wrong';
+      const optionsHtml = q.options.map((opt, oi) => {
+        let cls = 'option-btn';
+        if (status === 'correct' && oi === q.correctIndex) cls += ' correct';
+        else if (status === 'wrong' && oi === selected) cls += ' wrong';
+        else if (revealed && oi === q.correctIndex) cls += ' correct';
+        return `<button type="button" class="${cls}" data-opt="${oi}" ${locked ? 'disabled' : ''}><span class="option-letter">${letters[oi]}</span><span>${opt}</span></button>`;
+      }).join('');
+
+      let fb = '';
+      if (status === 'correct') {
+        fb = `<div class="feedback-box correct"><strong>🎉 Benar sekali! (+${appState.quiz.earnedPoints[idx]} poin)</strong><p style="margin-top:4px;"><strong>Pembahasan:</strong> ${q.explanation}</p>
+              <div class="feedback-actions">${idx < 4 ? '<button type="button" id="btn-q-next" class="btn btn-blue btn-sm">Soal Berikutnya ➜</button>' : '<button type="button" id="btn-q-finish" class="btn btn-orange btn-sm">Lihat Hasil Akhir 🏆</button>'}</div></div>`;
+      } else if (status === 'wrong') {
+        fb = `<div class="feedback-box wrong"><strong>💡 Belum tepat! Jangan menyerah, cek kembali rumusnya ya.</strong>${revealed ? `<p style="margin-top:6px;"><strong>Pembahasan:</strong> ${q.explanation}</p>` : ''}
+              <div class="feedback-actions"><button type="button" id="btn-q-retry" class="btn btn-orange btn-sm">↺ Coba Lagi Soal Ini</button>
+              ${!revealed ? '<button type="button" id="btn-q-reveal" class="btn btn-outline btn-sm">👁️ Lihat Pembahasan</button>' : ''}
+              ${idx < 4 ? '<button type="button" id="btn-q-next" class="btn btn-blue btn-sm">Lewati ke Soal Berikutnya ➜</button>' : ''}</div></div>`;
+      }
+
+      const card = document.getElementById('quiz-card-container');
+      card.innerHTML = `<h3 class="quiz-question-title">${q.question}</h3><div class="options-list">${optionsHtml}</div>${fb}`;
+
+      card.querySelectorAll('.option-btn').forEach((btn) => btn.addEventListener('click', () => {
+        const chosen = Number(btn.dataset.opt);
+        appState.quiz.answers[idx] = chosen;
+        if (chosen === q.correctIndex) {
+          appState.quiz.status[idx] = 'correct';
+          if (!appState.quiz.revealed[idx] && appState.quiz.earnedPoints[idx] === 0) appState.quiz.earnedPoints[idx] = appState.quiz.retried[idx] ? 15 : 20;
+          playSfx('correct');
+        } else {
+          appState.quiz.status[idx] = 'wrong';
+          playSfx('wrong');
+        }
+        renderQuiz();
+      }));
+
+      document.getElementById('btn-q-retry')?.addEventListener('click', () => { appState.quiz.status[idx] = 'unanswered'; appState.quiz.answers[idx] = null; appState.quiz.retried[idx] = true; renderQuiz(); });
+      document.getElementById('btn-q-reveal')?.addEventListener('click', () => { appState.quiz.revealed[idx] = true; renderQuiz(); });
+      document.getElementById('btn-q-next')?.addEventListener('click', () => { appState.quiz.currentIndex = Math.min(4, idx + 1); renderQuiz(); });
+      document.getElementById('btn-q-finish')?.addEventListener('click', showQuizSummary);
+
+      if (appState.quiz.status.every((s) => s === 'correct')) showQuizSummary();
+      else document.getElementById('quiz-summary-card').classList.add('hidden');
+    }
+
+    function showQuizSummary() {
+      const totalScore = appState.quiz.earnedPoints.reduce((a, v) => a + v, 0);
+      const el = document.getElementById('quiz-summary-card');
+      const predikat = totalScore >= 85 ? 'Luar Biasa! Master Transformasi 🏆' : totalScore >= 60 ? 'Bagus! Pemahaman Sudah Mantap 👍' : 'Terus Berlatih!';
+      el.classList.remove('hidden');
+      el.innerHTML = `<h3>${predikat}</h3><p style="margin:8px 0 16px;">Skor akhir kuis kamu adalah <strong style="font-size:1.3rem;color:#f97316;">${totalScore} / 100</strong>.</p>
+        <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;"><button type="button" id="btn-summary-retry" class="btn btn-orange">↺ Coba Lagi Kuis</button><button type="button" id="btn-summary-next" class="btn btn-blue">Lanjut ke Rangkuman ➜</button></div>`;
+      document.getElementById('btn-summary-retry').addEventListener('click', resetAllQuiz);
+      document.getElementById('btn-summary-next').addEventListener('click', () => goToPage(5));
+    }
+
+    function resetAllQuiz() {
+      appState.quiz = { currentIndex: 0, answers: Array(5).fill(null), status: Array(5).fill('unanswered'), retried: Array(5).fill(false), revealed: Array(5).fill(false), earnedPoints: Array(5).fill(0) };
+      renderQuiz();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.step-pill').forEach((b) => b.addEventListener('click', () => goToPage(Number(b.dataset.page))));
+      document.getElementById('brand-home').addEventListener('click', () => goToPage(1));
+      document.getElementById('nav-home').addEventListener('click', () => goToPage(1));
+      document.getElementById('nav-back').addEventListener('click', () => goToPage(appState.currentPage - 1));
+      document.getElementById('nav-next').addEventListener('click', () => goToPage(appState.currentPage + 1));
+      document.getElementById('btn-start-explore').addEventListener('click', () => goToPage(2));
+      document.getElementById('btn-review-lab').addEventListener('click', () => goToPage(3));
+      document.getElementById('btn-retake-quiz').addEventListener('click', () => { resetAllQuiz(); goToPage(4); });
+
+      const bgmMain = document.getElementById('audio-bgm-main');
+      const bgmQuiz = document.getElementById('audio-bgm-quiz');
+      const btnPlay = document.getElementById('btn-audio-play');
+      const btnPause = document.getElementById('btn-audio-pause');
+      const btnMute = document.getElementById('btn-audio-mute');
+      bgmMain.volume = bgmQuiz.volume = appState.audio.volume;
+
+      const syncAudioUI = () => {
+        btnPlay.disabled = appState.audio.isPlaying;
+        btnPause.disabled = !appState.audio.isPlaying;
+        btnPlay.classList.toggle('active-ctrl', appState.audio.isPlaying);
+        btnMute.textContent = appState.audio.isMuted ? '🔇 Unmute' : '🔊 Mute';
+        btnMute.classList.toggle('active-ctrl', appState.audio.isMuted);
+      };
+      btnPlay.addEventListener('click', () => { appState.audio.isPlaying = true; playActiveBgm(); syncAudioUI(); });
+      btnPause.addEventListener('click', () => { appState.audio.isPlaying = false; bgmMain.pause(); bgmQuiz.pause(); stopSynthLoop(); syncAudioUI(); });
+      btnMute.addEventListener('click', () => { appState.audio.isMuted = !appState.audio.isMuted; bgmMain.muted = bgmQuiz.muted = appState.audio.isMuted; syncAudioUI(); });
+      document.getElementById('audio-volume').addEventListener('input', (e) => { appState.audio.volume = Number(e.target.value) / 100; bgmMain.volume = bgmQuiz.volume = appState.audio.volume; });
+
+      document.querySelectorAll('.btn-toggle-ex').forEach((btn) => btn.addEventListener('click', () => {
+        const hid = document.getElementById(btn.dataset.target).classList.toggle('hidden');
+        btn.textContent = hid ? 'Lihat Penyelesaian ▾' : 'Sembunyikan ▴';
+      }));
+      document.querySelectorAll('.btn-popup-formula').forEach((btn) => btn.addEventListener('click', () => {
+        const d = QUICK_FORMULAS[btn.dataset.type];
+        appState.selectedPopupTransform = d.labValue;
+        document.getElementById('formula-modal-title').textContent = d.title;
+        document.getElementById('formula-modal-body').innerHTML = d.html;
+        openModal('formula-modal');
+      }));
+      document.getElementById('btn-try-in-lab').addEventListener('click', () => {
+        closeModal('formula-modal');
+        document.getElementById('sim-transform').value = appState.selectedPopupTransform;
+        updateCartesianSimulation();
+        goToPage(3);
+      });
+      document.querySelectorAll('[data-close-modal]').forEach((el) => el.addEventListener('click', () => closeModal(el.dataset.closeModal)));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal('formula-modal'); });
+
+      [['sim-x','sim-x-range'],['sim-y','sim-y-range'],['sim-a','sim-a-range'],['sim-b','sim-b-range'],['sim-k','sim-k-range']].forEach(([n,r]) => {
+        const ne = document.getElementById(n), re = document.getElementById(r);
+        re.addEventListener('input', () => { ne.value = re.value; updateCartesianSimulation(); });
+        ne.addEventListener('input', () => { re.value = ne.value; updateCartesianSimulation(); });
+      });
+      document.getElementById('sim-transform').addEventListener('change', updateCartesianSimulation);
+      document.getElementById('btn-sim-reset').addEventListener('click', () => {
+        document.getElementById('sim-x').value = document.getElementById('sim-x-range').value = 2;
+        document.getElementById('sim-y').value = document.getElementById('sim-y-range').value = 3;
+        document.getElementById('sim-a').value = document.getElementById('sim-a-range').value = 2;
+        document.getElementById('sim-b').value = document.getElementById('sim-b-range').value = -4;
+        document.getElementById('sim-k').value = document.getElementById('sim-k-range').value = 2;
+        document.getElementById('sim-transform').value = 'translasi';
+        updateCartesianSimulation();
+      });
+      updateCartesianSimulation();
+
+      document.getElementById('btn-quiz-reset-all').addEventListener('click', resetAllQuiz);
+      renderQuiz();
+      syncAudioUI();
+    });
+  </script>
+</body>
+</html>
